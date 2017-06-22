@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>WebSocket API</title>
+    </head>
+<body>
+    <div id="webSocketOutput"></div>
+    <script>
+        var webSocketOutput = document.getElementById('webSocketOutput');
+        var appendToWebSocketOutput = function(data) {
+            webSocketOutput.appendChild(document.createTextNode(data));
+            webSocketOutput.appendChild(document.createElement('br'));
+        };
+
+        var webSocket = new WebSocket('ws://localhost:63290/socket', ['aspnetcore-ws.plaintext', 'aspnetcore-ws.json']);
+        //var webSocket = new WebSocket('ws://localhost:63290/socket');
+        webSocket.onopen = function () { appendToWebSocketOutput('-- CONNECTION ESTABLISHED --'); };
+        webSocket.onclose = function () { appendToWebSocketOutput('-- CONNECTION CLOSED --'); };
+        webSocket.onerror = function () { appendToWebSocketOutput('-- ERROR OCCURRED --'); };
+
+        webSocket.onmessage = function (message) {
+            if (message.data instanceof Blob) {
+            } else {
+                if (webSocket.protocol == 'aspnetcore-ws.json') {
+                    var parsedData = JSON.parse(message.data);
+                    appendToWebSocketOutput('[' + parsedData.timestamp + '] ' + parsedData.message);
+                } else {
+                    appendToWebSocketOutput(message.data);
+                }
+            }
+        };
+    </script>
+</body>
+</html>
