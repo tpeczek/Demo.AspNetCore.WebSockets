@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Demo.AspNetCore.WebSockets.Infrastructure;
 using Demo.AspNetCore.WebSockets.Services;
 using System.Threading;
+using System.Linq;
 
 namespace Demo.AspNetCore.WebSockets.Middlewares
 {
@@ -30,16 +31,40 @@ namespace Demo.AspNetCore.WebSockets.Middlewares
             if (context.WebSockets.IsWebSocketRequest)
             {
                 ITextWebSocketSubprotocol subProtocol = NegotiateSubProtocol(context.WebSockets.WebSocketRequestedProtocols);
+
                 WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync(subProtocol?.SubProtocol);
+
                 WebSocketConnection webSocketConnection = new WebSocketConnection(webSocket, subProtocol ?? _options.DefaultSubProtocol);
+                webSocketConnection.Receive += async (sender, message) => { await webSocketConnection.SendAsync(message, CancellationToken.None); };
 
                 _connectionsService.AddConnection(webSocketConnection);
 
                 byte[] webSocketBuffer = new byte[1024 * 4];
                 WebSocketReceiveResult webSocketReceiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(webSocketBuffer), CancellationToken.None);
-                if (webSocketReceiveResult.MessageType != WebSocketMessageType.Close)
+                while (webSocketReceiveResult.MessageType != WebSocketMessageType.Close)
                 {
-                    throw new NotSupportedException("This demo doesn't support receiving data.");
+                    byte[] webSocketReceivedBytes = null;
+
+                    if (webSocketReceiveResult.EndOfMessage)
+                    {
+                        webSocketReceivedBytes = new byte[webSocketReceiveResult.Count];
+                        Array.Copy(webSocketBuffer, webSocketReceivedBytes, webSocketReceivedBytes.Length);
+                    }
+                    else
+                    {
+                        IEnumerable<byte> webSocketReceivedBytesEnumerable = Enumerable.Empty<byte>();
+                        webSocketReceivedBytesEnumerable = webSocketReceivedBytesEnumerable.Concat(webSocketBuffer);
+
+                        while (!webSocketReceiveResult.EndOfMessage)
+                        {
+                            webSocketReceiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(webSocketBuffer), CancellationToken.None);
+                            webSocketReceivedBytesEnumerable = webSocketReceivedBytesEnumerable.Concat(webSocketBuffer.Take(webSocketReceiveResult.Count));
+                        }
+                    }
+
+                    webSocketConnection.OnReceive(webSocketReceivedBytes);
+
+                    webSocketReceiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(webSocketBuffer), CancellationToken.None);
                 }
                 await webSocket.CloseAsync(webSocketReceiveResult.CloseStatus.Value, webSocketReceiveResult.CloseStatusDescription, CancellationToken.None);
 

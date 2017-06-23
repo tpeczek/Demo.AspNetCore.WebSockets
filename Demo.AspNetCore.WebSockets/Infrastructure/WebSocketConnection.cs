@@ -16,6 +16,10 @@ namespace Demo.AspNetCore.WebSockets.Infrastructure
         public Guid Id => Guid.NewGuid();
         #endregion
 
+        #region Events
+        public event EventHandler<string> Receive;
+        #endregion
+
         #region Constructor
         public WebSocketConnection(WebSocket webSocket, ITextWebSocketSubprotocol subProtocol)
         {
@@ -28,6 +32,13 @@ namespace Demo.AspNetCore.WebSockets.Infrastructure
         public Task SendAsync(string message, CancellationToken cancellationToken)
         {
             return _subProtocol.SendAsync(message, _webSocket, cancellationToken);
+        }
+
+        public void OnReceive(byte[] receivedBytes)
+        {
+            string message = _subProtocol.Read(receivedBytes);
+
+            Receive?.Invoke(this, message);
         }
         #endregion
     }

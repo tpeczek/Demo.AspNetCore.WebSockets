@@ -2,34 +2,30 @@
 <html>
     <head>
         <meta charset="utf-8" />
+        <link rel="stylesheet" href="/styles/websocket-api.css" />
         <title>WebSocket API</title>
     </head>
 <body>
-    <div id="webSocketOutput"></div>
-    <script>
-        var webSocketOutput = document.getElementById('webSocketOutput');
-        var appendToWebSocketOutput = function(data) {
-            webSocketOutput.appendChild(document.createTextNode(data));
-            webSocketOutput.appendChild(document.createElement('br'));
-        };
-
-        var webSocket = new WebSocket('ws://localhost:63290/socket', ['aspnetcore-ws.plaintext', 'aspnetcore-ws.json']);
-        //var webSocket = new WebSocket('ws://localhost:63290/socket');
-        webSocket.onopen = function () { appendToWebSocketOutput('-- CONNECTION ESTABLISHED --'); };
-        webSocket.onclose = function () { appendToWebSocketOutput('-- CONNECTION CLOSED --'); };
-        webSocket.onerror = function () { appendToWebSocketOutput('-- ERROR OCCURRED --'); };
-
-        webSocket.onmessage = function (message) {
-            if (message.data instanceof Blob) {
-            } else {
-                if (webSocket.protocol == 'aspnetcore-ws.json') {
-                    var parsedData = JSON.parse(message.data);
-                    appendToWebSocketOutput('[' + parsedData.timestamp + '] ' + parsedData.message);
-                } else {
-                    appendToWebSocketOutput(message.data);
-                }
-            }
-        };
-    </script>
+    <div>
+        <div id="echo-configuration">
+            <label for="location">Location:</label><br>
+            <input type="text" id="location" value="ws://localhost:63290/socket"><br>
+            <label for="location">Subprotocols:</label><br>
+            <input type="checkbox" id="plainTextSubprotocol" checked="checked" /> <label for="plainText" class="checkbox-label">aspnetcore-ws.plaintext</label><br>
+            <input type="checkbox" id="jsonSubprotocol" checked="checked" /> <label for="json" class="checkbox-label">aspnetcore-ws.aspnetcore-ws.json</label><br>
+            <button id="connect">Connect</button>
+            <button disabled="disabled" id="disconnect">Disconnect</button>
+            <br><br>
+            <label for="message">Message:</label><br>
+            <input disabled="disabled" id="message"><br>
+            <button disabled="disabled" id="send">Send</button>
+        </div>
+        <div id="echo-output">
+            <label>Log:</label>
+            <div id="console"></div>
+            <button id="clear" style="position: relative; top: 3px;">Clear</button>
+        </div>
+    </div>
+    <script src="scripts/websocket-api.js"></script>
 </body>
 </html>

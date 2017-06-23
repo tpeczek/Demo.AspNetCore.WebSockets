@@ -5,6 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="wwwroot\scripts\websocket-api.js" />
+    <Content Include="wwwroot\styles\websocket-api.css" />
     <Content Include="wwwroot\websocket-api.html" />
   </ItemGroup>
   <ItemGroup>

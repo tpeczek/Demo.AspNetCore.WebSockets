@@ -1,0 +1,59 @@
+﻿label {
+    font-family: "Open Sans";
+    font-size: 13px;
+    font-weight: 700;
+}
+
+label.checkbox-label {
+    font-weight: normal;
+}
+
+input {
+    font-family: "Open Sans";
+    border: 1px solid #ccc;
+}
+
+button {
+    font-family: "Open Sans";
+    font-size: 13px;
+    font-weight: 700;
+    background-color: #eee;
+    vertical-align: baseline;
+    margin-top: 5px;
+    border-color: #ccc;
+    border-width: 1px;
+    border-style: solid !important;
+}
+
+button:hover {
+    color: #f60;
+    border-color: #f60;
+    border-width: 1px;
+    border-style: solid !important;
+}
+
+#echo-configuration {
+    float: left;
+}
+
+#echo-output {
+    float: left;
+    margin-left: 20px;
+    padding-left: 20px;
+    width: 645px;
+    border-left: solid 1px #cccccc;
+}
+
+#console {
+    border: solid 1px #999999;
+    border-top-color: #CCCCCC;
+    border-left-color: #CCCCCC;
+    padding: 5px;
+    width: 100%;
+    height: 172px;
+    overflow-y: scroll;
+}
+
+#console p {
+    font-size: 11px;
+}

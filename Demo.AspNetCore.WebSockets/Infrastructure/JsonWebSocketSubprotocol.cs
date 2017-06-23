@@ -7,19 +7,15 @@ using Newtonsoft.Json;
 
 namespace Demo.AspNetCore.WebSockets.Infrastructure
 {
-    public class JsonWebSocketSubprotocol : ITextWebSocketSubprotocol
+    public class JsonWebSocketSubprotocol : TextWebSocketSubprotocolBase, ITextWebSocketSubprotocol
     {
         public string SubProtocol => "aspnetcore-ws.json";
 
-        public async Task SendAsync(string message, WebSocket webSocket, CancellationToken cancellationToken)
+        public override Task SendAsync(string message, WebSocket webSocket, CancellationToken cancellationToken)
         {
-            if (webSocket.State == WebSocketState.Open)
-            {
-                string jsonMessage = JsonConvert.SerializeObject(new { message, timestamp = DateTime.UtcNow });
-                ArraySegment<byte> buffer = new ArraySegment<byte>(Encoding.ASCII.GetBytes(jsonMessage), 0, jsonMessage.Length);
+            string jsonMessage = JsonConvert.SerializeObject(new { message, timestamp = DateTime.UtcNow });
 
-                await webSocket.SendAsync(buffer, WebSocketMessageType.Text, true, cancellationToken);
-            }
+            return base.SendAsync(jsonMessage, webSocket, cancellationToken);
         }
     }
 }

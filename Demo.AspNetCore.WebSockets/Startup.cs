@@ -24,19 +24,25 @@ namespace Demo.AspNetCore.WebSockets
                 app.UseDeveloperExceptionPage();
             }
 
-            ITextWebSocketSubprotocol textWebSocketSubprotocol = new PlainTextWebSocketSubprotocol();
+            DefaultFilesOptions defaultFilesOptions = new DefaultFilesOptions();
+            defaultFilesOptions.DefaultFileNames.Clear();
+            defaultFilesOptions.DefaultFileNames.Add("websocket-api.html");
 
-            app.UseStaticFiles()
-                .UseWebSockets()
-                .MapWebSocketConnections("/socket", new WebSocketConnectionsOptions
+            ITextWebSocketSubprotocol textWebSocketSubprotocol = new PlainTextWebSocketSubprotocol();
+            WebSocketConnectionsOptions webSocketConnectionsOptions = new WebSocketConnectionsOptions
+            {
+                SupportedSubProtocols = new List<ITextWebSocketSubprotocol>
                 {
-                    SupportedSubProtocols = new List<ITextWebSocketSubprotocol>
-                    {
-                        new JsonWebSocketSubprotocol(),
-                        textWebSocketSubprotocol
-                    },
-                    DefaultSubProtocol = textWebSocketSubprotocol
-                })
+                    new JsonWebSocketSubprotocol(),
+                    textWebSocketSubprotocol
+                },
+                DefaultSubProtocol = textWebSocketSubprotocol
+            };
+
+            app.UseDefaultFiles(defaultFilesOptions)
+                .UseStaticFiles()
+                .UseWebSockets()
+                .MapWebSocketConnections("/socket", webSocketConnectionsOptions)
                 .Run(async (context) =>
                 {
                     await context.Response.WriteAsync("-- Demo.AspNetCore.WebSocket --");
