@@ -31,6 +31,7 @@ namespace Demo.AspNetCore.WebSockets
             ITextWebSocketSubprotocol textWebSocketSubprotocol = new PlainTextWebSocketSubprotocol();
             WebSocketConnectionsOptions webSocketConnectionsOptions = new WebSocketConnectionsOptions
             {
+                AllowedOrigins = new HashSet<string> { "http://localhost:63290" },
                 SupportedSubProtocols = new List<ITextWebSocketSubprotocol>
                 {
                     new JsonWebSocketSubprotocol(),
