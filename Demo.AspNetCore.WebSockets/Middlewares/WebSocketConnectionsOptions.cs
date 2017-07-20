@@ -10,5 +10,14 @@ namespace Demo.AspNetCore.WebSockets.Middlewares
         public IList<ITextWebSocketSubprotocol> SupportedSubProtocols { get; set; }
 
         public ITextWebSocketSubprotocol DefaultSubProtocol { get; set; }
+
+        public int? SendSegmentSize { get; set; }
+
+        public int ReceivePayloadBufferSize { get; set; }
+
+        public WebSocketConnectionsOptions()
+        {
+            ReceivePayloadBufferSize = 4 * 1024;
+        }
     }
 }

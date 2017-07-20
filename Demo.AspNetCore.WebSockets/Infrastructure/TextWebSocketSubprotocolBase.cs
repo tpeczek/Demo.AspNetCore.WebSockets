@@ -3,26 +3,20 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Net.WebSockets;
+using Lib.AspNetCore.WebSocketsCompression.Providers;
 
 namespace Demo.AspNetCore.WebSockets.Infrastructure
 {
     public abstract class TextWebSocketSubprotocolBase
     {
-        public event EventHandler<string> Receive;
-
-        public async virtual Task SendAsync(string message, WebSocket webSocket, CancellationToken cancellationToken)
+        public virtual Task SendAsync(string message, WebSocket webSocket, IWebSocketCompressionProvider webSocketCompressionProvider, CancellationToken cancellationToken)
         {
-            if (webSocket.State == WebSocketState.Open)
-            {
-                ArraySegment<byte> buffer = new ArraySegment<byte>(Encoding.ASCII.GetBytes(message), 0, message.Length);
-
-                await webSocket.SendAsync(buffer, WebSocketMessageType.Text, true, cancellationToken);
-            }
+            return webSocketCompressionProvider.CompressTextMessageAsync(webSocket, message, cancellationToken);
         }
 
-        public virtual string Read(byte[] bytes)
+        public virtual string Read(string webSocketMessage)
         {
-            return Encoding.ASCII.GetString(bytes);
+            return webSocketMessage;
         }
     }
 }

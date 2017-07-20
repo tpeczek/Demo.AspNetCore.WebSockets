@@ -14,6 +14,7 @@ namespace Demo.AspNetCore.WebSockets
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddWebSocketCompression();
             services.AddWebSocketConnections();
         }
 
@@ -37,12 +38,13 @@ namespace Demo.AspNetCore.WebSockets
                     new JsonWebSocketSubprotocol(),
                     textWebSocketSubprotocol
                 },
-                DefaultSubProtocol = textWebSocketSubprotocol
+                DefaultSubProtocol = textWebSocketSubprotocol,
+                SendSegmentSize = 4 * 1024
             };
 
             app.UseDefaultFiles(defaultFilesOptions)
                 .UseStaticFiles()
-                .UseWebSockets()
+                .UseWebSocketsCompression()
                 .MapWebSocketConnections("/socket", webSocketConnectionsOptions)
                 .Run(async (context) =>
                 {
