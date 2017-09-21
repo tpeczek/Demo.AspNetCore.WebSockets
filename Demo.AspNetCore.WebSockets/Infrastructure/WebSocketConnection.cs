@@ -6,7 +6,7 @@ using Lib.AspNetCore.WebSocketsCompression.Providers;
 
 namespace Demo.AspNetCore.WebSockets.Infrastructure
 {
-    public class WebSocketConnection
+    internal class WebSocketConnection
     {
         #region Fields
         private WebSocket _webSocket;

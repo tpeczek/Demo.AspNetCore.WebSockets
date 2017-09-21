@@ -7,7 +7,7 @@ using Demo.AspNetCore.WebSockets.Infrastructure;
 
 namespace Demo.AspNetCore.WebSockets.Services
 {
-    public class WebSocketConnectionsService : IWebSocketConnectionsService
+    internal class WebSocketConnectionsService : IWebSocketConnectionsService
     {
         #region Fields
         private readonly ConcurrentDictionary<Guid, WebSocketConnection> _connections = new ConcurrentDictionary<Guid, WebSocketConnection>();

@@ -5,7 +5,7 @@ using Demo.AspNetCore.WebSockets.Infrastructure;
 
 namespace Demo.AspNetCore.WebSockets.Services
 {
-    public interface IWebSocketConnectionsService
+    internal interface IWebSocketConnectionsService
     {
         void AddConnection(WebSocketConnection connection);
 

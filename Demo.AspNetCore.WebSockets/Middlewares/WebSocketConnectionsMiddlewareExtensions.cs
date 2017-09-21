@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Builder;
 
 namespace Demo.AspNetCore.WebSockets.Middlewares
 {
-    public static class WebSocketConnectionsMiddlewareExtensions
+    internal static class WebSocketConnectionsMiddlewareExtensions
     {
         public static IApplicationBuilder MapWebSocketConnections(this IApplicationBuilder app, PathString pathMatch, WebSocketConnectionsOptions options)
         {

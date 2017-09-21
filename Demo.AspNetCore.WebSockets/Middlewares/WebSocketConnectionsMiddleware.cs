@@ -11,7 +11,7 @@ using Lib.AspNetCore.WebSocketsCompression.Providers;
 
 namespace Demo.AspNetCore.WebSockets.Middlewares
 {
-    public class WebSocketConnectionsMiddleware
+    internal class WebSocketConnectionsMiddleware
     {
         #region Fields
         private WebSocketConnectionsOptions _options;

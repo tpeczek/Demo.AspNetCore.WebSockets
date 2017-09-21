@@ -3,7 +3,7 @@ using Demo.AspNetCore.WebSockets.Infrastructure;
 
 namespace Demo.AspNetCore.WebSockets.Middlewares
 {
-    public class WebSocketConnectionsOptions
+    internal class WebSocketConnectionsOptions
     {
         public HashSet<string> AllowedOrigins { get; set; }
 

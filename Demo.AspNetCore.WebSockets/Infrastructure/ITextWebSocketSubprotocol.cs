@@ -5,7 +5,7 @@ using Lib.AspNetCore.WebSocketsCompression.Providers;
 
 namespace Demo.AspNetCore.WebSockets.Infrastructure
 {
-    public interface ITextWebSocketSubprotocol
+    internal interface ITextWebSocketSubprotocol
     {
         string SubProtocol { get; }
 

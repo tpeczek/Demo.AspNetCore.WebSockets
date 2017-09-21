@@ -2,7 +2,7 @@
 
 namespace Demo.AspNetCore.WebSockets.Services
 {
-    public static class WebSocketConnectionsServiceExtensions
+    internal static class WebSocketConnectionsServiceExtensions
     {
         public static IServiceCollection AddWebSocketConnections(this IServiceCollection services)
         {
