@@ -35,14 +35,14 @@ namespace Demo.AspNetCore.WebSockets.Middlewares
             {
                 if (ValidateOrigin(context))
                 {
-                    ITextWebSocketSubprotocol subProtocol = NegotiateSubProtocol(context.WebSockets.WebSocketRequestedProtocols);
+                    ITextWebSocketSubprotocol textSubProtocol = NegotiateSubProtocol(context.WebSockets.WebSocketRequestedProtocols);
 
                     IWebSocketCompressionProvider webSocketCompressionProvider = _compressionService.NegotiateCompression(context);
 
-                    WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync(subProtocol?.SubProtocol);
+                    WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync(textSubProtocol?.SubProtocol);
 
-                    WebSocketConnection webSocketConnection = new WebSocketConnection(webSocket, webSocketCompressionProvider, subProtocol ?? _options.DefaultSubProtocol, _options.ReceivePayloadBufferSize);
-                    webSocketConnection.Receive += async (sender, message) => { await webSocketConnection.SendAsync(message, CancellationToken.None); };
+                    WebSocketConnection webSocketConnection = new WebSocketConnection(webSocket, webSocketCompressionProvider, textSubProtocol ?? _options.DefaultSubProtocol, _options.ReceivePayloadBufferSize);
+                    webSocketConnection.ReceiveText += async (sender, message) => { await webSocketConnection.SendAsync(message, CancellationToken.None); };
 
                     _connectionsService.AddConnection(webSocketConnection);
 

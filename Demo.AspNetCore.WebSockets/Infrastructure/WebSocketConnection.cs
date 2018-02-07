@@ -11,7 +11,7 @@ namespace Demo.AspNetCore.WebSockets.Infrastructure
         #region Fields
         private WebSocket _webSocket;
         private IWebSocketCompressionProvider _webSocketCompressionProvider;
-        private ITextWebSocketSubprotocol _subProtocol;
+        private ITextWebSocketSubprotocol _textSubProtocol;
         private int _receivePayloadBufferSize;
         #endregion
 
@@ -24,15 +24,17 @@ namespace Demo.AspNetCore.WebSockets.Infrastructure
         #endregion
 
         #region Events
-        public event EventHandler<string> Receive;
+        public event EventHandler<string> ReceiveText;
+
+        public event EventHandler<byte[]> ReceiveBinary;
         #endregion
 
         #region Constructor
-        public WebSocketConnection(WebSocket webSocket, IWebSocketCompressionProvider webSocketCompressionProvider, ITextWebSocketSubprotocol subProtocol, int receivePayloadBufferSize)
+        public WebSocketConnection(WebSocket webSocket, IWebSocketCompressionProvider webSocketCompressionProvider, ITextWebSocketSubprotocol textSubProtocol, int receivePayloadBufferSize)
         {
             _webSocket = webSocket ?? throw new ArgumentNullException(nameof(webSocket));
             _webSocketCompressionProvider = webSocketCompressionProvider ?? throw new ArgumentNullException(nameof(webSocketCompressionProvider));
-            _subProtocol = subProtocol ?? throw new ArgumentNullException(nameof(subProtocol));
+            _textSubProtocol = textSubProtocol ?? throw new ArgumentNullException(nameof(textSubProtocol));
             _receivePayloadBufferSize = receivePayloadBufferSize;
         }
         #endregion
@@ -40,7 +42,12 @@ namespace Demo.AspNetCore.WebSockets.Infrastructure
         #region Methods
         public Task SendAsync(string message, CancellationToken cancellationToken)
         {
-            return _subProtocol.SendAsync(message, _webSocket, _webSocketCompressionProvider, cancellationToken);
+            return _textSubProtocol.SendAsync(message, _webSocket, _webSocketCompressionProvider, cancellationToken);
+        }
+
+        public Task SendAsync(byte[] message, CancellationToken cancellationToken)
+        {
+            return _webSocketCompressionProvider.CompressBinaryMessageAsync(_webSocket, message, cancellationToken);
         }
 
         public async Task ReceiveMessagesUntilCloseAsync()
@@ -53,12 +60,13 @@ namespace Demo.AspNetCore.WebSockets.Infrastructure
                 {
                     if (webSocketReceiveResult.MessageType == WebSocketMessageType.Binary)
                     {
-                        await _webSocketCompressionProvider.DecompressBinaryMessageAsync(_webSocket, webSocketReceiveResult, receivePayloadBuffer);
+                        byte[] webSocketMessage = await _webSocketCompressionProvider.DecompressBinaryMessageAsync(_webSocket, webSocketReceiveResult, receivePayloadBuffer);
+                        OnReceiveBinary(webSocketMessage);
                     }
                     else
                     {
                         string webSocketMessage = await _webSocketCompressionProvider.DecompressTextMessageAsync(_webSocket, webSocketReceiveResult, receivePayloadBuffer);
-                        OnReceive(webSocketMessage);
+                        OnReceiveText(webSocketMessage);
                     }
 
                     webSocketReceiveResult = await _webSocket.ReceiveAsync(new ArraySegment<byte>(receivePayloadBuffer), CancellationToken.None);
@@ -71,11 +79,16 @@ namespace Demo.AspNetCore.WebSockets.Infrastructure
             { }
         }
 
-        private void OnReceive(string webSocketMessage)
+        private void OnReceiveText(string webSocketMessage)
         {
-            string message = _subProtocol.Read(webSocketMessage);
+            string message = _textSubProtocol.Read(webSocketMessage);
 
-            Receive?.Invoke(this, message);
+            ReceiveText?.Invoke(this, message);
+        }
+
+        private void OnReceiveBinary(byte[] webSocketMessage)
+        {
+            ReceiveBinary?.Invoke(this, webSocketMessage);
         }
         #endregion
     }
