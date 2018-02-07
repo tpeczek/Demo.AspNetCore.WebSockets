@@ -41,13 +41,17 @@ namespace Demo.AspNetCore.WebSockets.Middlewares
 
                     WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync(subProtocol?.SubProtocol);
 
-                    WebSocketConnection webSocketConnection = new WebSocketConnection(webSocket, webSocketCompressionProvider, subProtocol ?? _options.DefaultSubProtocol);
+                    WebSocketConnection webSocketConnection = new WebSocketConnection(webSocket, webSocketCompressionProvider, subProtocol ?? _options.DefaultSubProtocol, _options.ReceivePayloadBufferSize);
                     webSocketConnection.Receive += async (sender, message) => { await webSocketConnection.SendAsync(message, CancellationToken.None); };
+
                     _connectionsService.AddConnection(webSocketConnection);
 
-                    WebSocketReceiveResult webSocketCloseResult = await ReceiveMessagesAsync(webSocket, webSocketCompressionProvider, webSocketConnection);
+                    await webSocketConnection.ReceiveMessagesUntilCloseAsync();
 
-                    await webSocket.CloseAsync(webSocketCloseResult.CloseStatus.Value, webSocketCloseResult.CloseStatusDescription, CancellationToken.None);
+                    if (webSocketConnection.CloseStatus.HasValue)
+                    {
+                        await webSocket.CloseAsync(webSocketConnection.CloseStatus.Value, webSocketConnection.CloseStatusDescription, CancellationToken.None);
+                    }
 
                     _connectionsService.RemoveConnection(webSocketConnection.Id);
                 }
@@ -81,28 +85,6 @@ namespace Demo.AspNetCore.WebSockets.Middlewares
             }
 
             return subProtocol;
-        }
-
-        private async Task<WebSocketReceiveResult> ReceiveMessagesAsync(WebSocket webSocket, IWebSocketCompressionProvider webSocketCompressionProvider, WebSocketConnection webSocketConnection)
-        {
-            byte[] receivePayloadBuffer = new byte[_options.ReceivePayloadBufferSize];
-            WebSocketReceiveResult webSocketReceiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(receivePayloadBuffer), CancellationToken.None);
-            while (webSocketReceiveResult.MessageType != WebSocketMessageType.Close)
-            {
-                if (webSocketReceiveResult.MessageType == WebSocketMessageType.Binary)
-                {
-                    await webSocketCompressionProvider.DecompressBinaryMessageAsync(webSocket, webSocketReceiveResult, receivePayloadBuffer);
-                }
-                else
-                {
-                    string webSocketMessage = await webSocketCompressionProvider.DecompressTextMessageAsync(webSocket, webSocketReceiveResult, receivePayloadBuffer);
-                    webSocketConnection.OnReceive(webSocketMessage);
-                }
-
-                webSocketReceiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(receivePayloadBuffer), CancellationToken.None);
-            }
-
-            return webSocketReceiveResult;
         }
         #endregion
     }
