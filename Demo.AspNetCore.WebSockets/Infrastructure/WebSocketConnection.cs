@@ -16,7 +16,7 @@ namespace Demo.AspNetCore.WebSockets.Infrastructure
         #endregion
 
         #region Properties
-        public Guid Id => Guid.NewGuid();
+        public Guid Id { get; } = Guid.NewGuid();
 
         public WebSocketCloseStatus? CloseStatus { get; private set; } = null;
 
