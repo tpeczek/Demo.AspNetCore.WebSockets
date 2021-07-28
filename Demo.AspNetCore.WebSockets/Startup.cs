@@ -9,8 +9,6 @@ using Demo.AspNetCore.WebSockets.Infrastructure;
 using Demo.AspNetCore.WebSockets.Services;
 using Demo.AspNetCore.WebSockets.Middlewares;
 
-using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
-
 namespace Demo.AspNetCore.WebSockets
 {
     public class Startup
@@ -23,19 +21,19 @@ namespace Demo.AspNetCore.WebSockets
             services.AddSingleton<IHostedService, HeartbeatService>();
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
-            DefaultFilesOptions defaultFilesOptions = new DefaultFilesOptions();
+            DefaultFilesOptions defaultFilesOptions = new ();
             defaultFilesOptions.DefaultFileNames.Clear();
             defaultFilesOptions.DefaultFileNames.Add("websocket-api.html");
 
             ITextWebSocketSubprotocol textWebSocketSubprotocol = new PlainTextWebSocketSubprotocol();
-            WebSocketConnectionsOptions webSocketConnectionsOptions = new WebSocketConnectionsOptions
+            WebSocketConnectionsOptions webSocketConnectionsOptions = new ()
             {
                 AllowedOrigins = new HashSet<string> { "http://localhost:63290" },
                 SupportedSubProtocols = new List<ITextWebSocketSubprotocol>
