@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
@@ -15,7 +14,6 @@ namespace Demo.AspNetCore.WebSockets
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddWebSocketCompression();
             services.AddWebSocketConnections();
 
             services.AddSingleton<IHostedService, HeartbeatService>();
@@ -47,7 +45,7 @@ namespace Demo.AspNetCore.WebSockets
 
             app.UseDefaultFiles(defaultFilesOptions)
                 .UseStaticFiles()
-                .UseWebSocketsCompression()
+                .UseWebSockets()
                 .MapWebSocketConnections("/socket", webSocketConnectionsOptions)
                 .Run(async (context) =>
                 {

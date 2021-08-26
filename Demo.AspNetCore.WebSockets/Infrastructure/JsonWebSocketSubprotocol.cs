@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Net.WebSockets;
 using Newtonsoft.Json;
-using Lib.AspNetCore.WebSocketsCompression.Providers;
 
 namespace Demo.AspNetCore.WebSockets.Infrastructure
 {
@@ -11,11 +9,11 @@ namespace Demo.AspNetCore.WebSockets.Infrastructure
     {
         public string SubProtocol => "aspnetcore-ws.json";
 
-        public override Task SendAsync(string message, WebSocket webSocket, IWebSocketCompressionProvider webSocketCompressionProvider, CancellationToken cancellationToken)
+        public override Task SendAsync(string message, Func<byte[], CancellationToken, Task> sendMessageBytesAsync, CancellationToken cancellationToken)
         {
             string jsonMessage = JsonConvert.SerializeObject(new { message, timestamp = DateTime.UtcNow });
 
-            return base.SendAsync(jsonMessage, webSocket, webSocketCompressionProvider, cancellationToken);
+            return base.SendAsync(jsonMessage, sendMessageBytesAsync, cancellationToken);
         }
     }
 }

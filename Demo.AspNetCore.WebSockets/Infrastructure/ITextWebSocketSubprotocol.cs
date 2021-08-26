@@ -1,7 +1,6 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Net.WebSockets;
-using Lib.AspNetCore.WebSocketsCompression.Providers;
 
 namespace Demo.AspNetCore.WebSockets.Infrastructure
 {
@@ -9,7 +8,7 @@ namespace Demo.AspNetCore.WebSockets.Infrastructure
     {
         string SubProtocol { get; }
 
-        Task SendAsync(string message, WebSocket webSocket, IWebSocketCompressionProvider webSocketCompressionProvider, CancellationToken cancellationToken);
+        Task SendAsync(string message, Func<byte[], CancellationToken, Task> sendMessageBytesAsync, CancellationToken cancellationToken);
 
         string Read(string rawMessage);
     }

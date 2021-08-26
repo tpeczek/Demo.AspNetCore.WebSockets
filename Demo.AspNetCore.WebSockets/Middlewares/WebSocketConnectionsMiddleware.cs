@@ -6,25 +6,21 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Demo.AspNetCore.WebSockets.Infrastructure;
 using Demo.AspNetCore.WebSockets.Services;
-using Lib.AspNetCore.WebSocketsCompression;
-using Lib.AspNetCore.WebSocketsCompression.Providers;
 
 namespace Demo.AspNetCore.WebSockets.Middlewares
 {
     internal class WebSocketConnectionsMiddleware
     {
         #region Fields
-        private WebSocketConnectionsOptions _options;
-        private IWebSocketConnectionsService _connectionsService;
-        private IWebSocketCompressionService _compressionService;
+        private readonly WebSocketConnectionsOptions _options;
+        private readonly IWebSocketConnectionsService _connectionsService;
         #endregion
 
         #region Constructor
-        public WebSocketConnectionsMiddleware(RequestDelegate next, WebSocketConnectionsOptions options, IWebSocketConnectionsService connectionsService, IWebSocketCompressionService compressionService)
+        public WebSocketConnectionsMiddleware(RequestDelegate next, WebSocketConnectionsOptions options, IWebSocketConnectionsService connectionsService)
         {
             _options = options ?? throw new ArgumentNullException(nameof(options));
             _connectionsService = connectionsService ?? throw new ArgumentNullException(nameof(connectionsService));
-            _compressionService = compressionService ?? throw new ArgumentNullException(nameof(compressionService));
         }
         #endregion
 
@@ -37,11 +33,9 @@ namespace Demo.AspNetCore.WebSockets.Middlewares
                 {
                     ITextWebSocketSubprotocol textSubProtocol = NegotiateSubProtocol(context.WebSockets.WebSocketRequestedProtocols);
 
-                    IWebSocketCompressionProvider webSocketCompressionProvider = _compressionService.NegotiateCompression(context);
-
                     WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync(textSubProtocol?.SubProtocol);
 
-                    WebSocketConnection webSocketConnection = new WebSocketConnection(webSocket, webSocketCompressionProvider, textSubProtocol ?? _options.DefaultSubProtocol, _options.ReceivePayloadBufferSize);
+                    WebSocketConnection webSocketConnection = new WebSocketConnection(webSocket, textSubProtocol ?? _options.DefaultSubProtocol, _options.SendSegmentSize, _options.ReceivePayloadBufferSize);
                     webSocketConnection.ReceiveText += async (sender, message) => { await webSocketConnection.SendAsync(message, CancellationToken.None); };
 
                     _connectionsService.AddConnection(webSocketConnection);
