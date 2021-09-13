@@ -33,7 +33,11 @@ namespace Demo.AspNetCore.WebSockets.Middlewares
                 {
                     ITextWebSocketSubprotocol textSubProtocol = NegotiateSubProtocol(context.WebSockets.WebSocketRequestedProtocols);
 
-                    WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync(textSubProtocol?.SubProtocol);
+                    WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync(new WebSocketAcceptContext
+                    {
+                        SubProtocol = textSubProtocol?.SubProtocol,
+                        DangerousEnableCompression = true
+                    });
 
                     WebSocketConnection webSocketConnection = new WebSocketConnection(webSocket, textSubProtocol ?? _options.DefaultSubProtocol, _options.SendSegmentSize, _options.ReceivePayloadBufferSize);
                     webSocketConnection.ReceiveText += async (sender, message) => { await webSocketConnection.SendAsync(message, CancellationToken.None); };

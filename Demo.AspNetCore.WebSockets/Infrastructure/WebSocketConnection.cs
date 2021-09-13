@@ -49,7 +49,7 @@ namespace Demo.AspNetCore.WebSockets.Infrastructure
 
         public Task SendAsync(byte[] message, CancellationToken cancellationToken)
         {
-            return SendMessageBytesAsync(message, WebSocketMessageType.Binary, cancellationToken);
+            return SendMessageBytesAsync(message, WebSocketMessageType.Binary, cancellationToken: cancellationToken);
         }        
 
         public async Task ReceiveMessagesUntilCloseAsync()
@@ -82,10 +82,10 @@ namespace Demo.AspNetCore.WebSockets.Infrastructure
 
         private Task SendTextMessageBytesAsync(byte[] messageBytes, CancellationToken cancellationToken)
         {
-            return SendMessageBytesAsync(messageBytes, WebSocketMessageType.Text, cancellationToken);
+            return SendMessageBytesAsync(messageBytes, WebSocketMessageType.Text, cancellationToken: cancellationToken);
         }
 
-        private async Task SendMessageBytesAsync(byte[] messageBytes, WebSocketMessageType messageType, CancellationToken cancellationToken)
+        private async Task SendMessageBytesAsync(byte[] messageBytes, WebSocketMessageType messageType, bool compressMessage = true, CancellationToken cancellationToken = default)
         {
             if (_webSocket.State == WebSocketState.Open)
             {
@@ -102,16 +102,33 @@ namespace Demo.AspNetCore.WebSockets.Infrastructure
                         messageOffset += messageSegmentSize;
                         messageBytesToSend -= messageSegmentSize;
 
-                        await _webSocket.SendAsync(messageSegment, WebSocketMessageType.Text, (messageBytesToSend == 0), cancellationToken);
+                        await _webSocket.SendAsync(messageSegment, messageType, GetMessageFlags(messageBytesToSend == 0, !compressMessage), cancellationToken);
                     }
                 }
                 else
                 {
                     ArraySegment<byte> messageSegment = new ArraySegment<byte>(messageBytes, 0, messageBytes.Length);
 
-                    await _webSocket.SendAsync(messageSegment, WebSocketMessageType.Text, true, cancellationToken);
+                    await _webSocket.SendAsync(messageSegment, messageType, GetMessageFlags(true, !compressMessage), cancellationToken);
                 }
             }
+        }
+
+        private static WebSocketMessageFlags GetMessageFlags(bool endOfMessage, bool disableCompression)
+        {
+            WebSocketMessageFlags messageFlags = WebSocketMessageFlags.None;
+
+            if (endOfMessage)
+            {
+                messageFlags |= WebSocketMessageFlags.EndOfMessage;
+            }
+
+            if (disableCompression)
+            {
+                messageFlags |= WebSocketMessageFlags.DisableCompression;
+            }
+
+            return messageFlags;
         }
 
         private async Task<byte[]> ReceiveMessagePayloadAsync(WebSocketReceiveResult webSocketReceiveResult, byte[] receivePayloadBuffer)
