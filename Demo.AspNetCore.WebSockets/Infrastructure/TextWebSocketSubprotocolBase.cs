@@ -1,15 +1,17 @@
-﻿using System.Threading;
+﻿using System;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Net.WebSockets;
-using Lib.AspNetCore.WebSocketsCompression.Providers;
 
 namespace Demo.AspNetCore.WebSockets.Infrastructure
 {
     internal abstract class TextWebSocketSubprotocolBase
     {
-        public virtual Task SendAsync(string message, WebSocket webSocket, IWebSocketCompressionProvider webSocketCompressionProvider, CancellationToken cancellationToken)
+        public virtual Task SendAsync(string message, Func<byte[], CancellationToken, Task> sendMessageBytesAsync, CancellationToken cancellationToken)
         {
-            return webSocketCompressionProvider.CompressTextMessageAsync(webSocket, message, cancellationToken);
+            byte[] messageBytes = Encoding.UTF8.GetBytes(message);
+
+            return sendMessageBytesAsync(messageBytes, cancellationToken);
         }
 
         public virtual string Read(string webSocketMessage)
