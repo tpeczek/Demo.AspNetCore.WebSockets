@@ -5,7 +5,7 @@ Sample project for demonstrating low-level WebSocket protocol aspects in ASP.NET
 - [Lifetime & Prematurely closed connections](https://www.tpeczek.com/2018/02/back-to-websockets-fundamentals-in.html)
 - [Subprotocol negotiation](https://www.tpeczek.com/2017/06/websocket-subprotocol-negotiation-in.html)
 - [Cross-Site WebSocket Hijacking protection](https://www.tpeczek.com/2017/07/preventing-cross-site-websocket.html)
-- [Per-message compression](https://www.tpeczek.com/2017/07/websocket-per-message-compression-in.html)
+- [Per-message compression](https://www.tpeczek.com/2021/09/websocket-per-message-compression-in.html)
 
 ## Donating
 
