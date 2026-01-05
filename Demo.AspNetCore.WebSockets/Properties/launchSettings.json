@@ -3,6 +3,7 @@
     "Demo.AspNetCore.WebSocket": {
       "commandName": "Project",
       "launchBrowser": true,
+      "launchUrl": "websocket-api.html",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
