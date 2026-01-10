@@ -29,8 +29,7 @@ WebSocketConnectionsOptions webSocketConnectionsOptions = new()
 {
     AllowedOrigins = ["http://localhost:63290"],
     SupportedSubProtocols = [new JsonWebSocketSubprotocol(), textWebSocketSubprotocol],
-    DefaultSubProtocol = textWebSocketSubprotocol,
-    SendSegmentSize = 4 * 1024
+    DefaultSubProtocol = textWebSocketSubprotocol
 };
 
 app.UseDefaultFiles(defaultFilesOptions);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,16 +8,16 @@ namespace Demo.AspNetCore.WebSockets.Infrastructure
 {
     internal abstract class TextWebSocketSubprotocolBase
     {
-        public virtual Task SendAsync(string message, Func<byte[], CancellationToken, Task> sendMessageBytesAsync, CancellationToken cancellationToken)
+        public virtual Task SendAsync(string message, Stream webSocketMessageStream, CancellationToken cancellationToken)
         {
-            byte[] messageBytes = Encoding.UTF8.GetBytes(message);
-
-            return sendMessageBytesAsync(messageBytes, cancellationToken);
+            using StreamWriter webSocketMessageStreamWriter = new StreamWriter(webSocketMessageStream);
+            return webSocketMessageStreamWriter.WriteAsync(message);
         }
 
-        public virtual string Read(string webSocketMessage)
+        public virtual string Read(Stream webSocketMessageStream)
         {
-            return webSocketMessage;
+            using StreamReader webSocketMessageStreamReader = new StreamReader(webSocketMessageStream);
+            return webSocketMessageStreamReader.ReadToEnd();
         }
     }
 }
