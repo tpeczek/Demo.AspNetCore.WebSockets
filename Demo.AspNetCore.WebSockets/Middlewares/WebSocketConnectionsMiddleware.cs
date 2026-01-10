@@ -39,8 +39,8 @@ namespace Demo.AspNetCore.WebSockets.Middlewares
                         DangerousEnableCompression = true
                     });
 
-                    WebSocketConnection webSocketConnection = new WebSocketConnection(webSocket, textSubProtocol ?? _options.DefaultSubProtocol, _options.SendSegmentSize, _options.ReceivePayloadBufferSize);
-                    webSocketConnection.ReceiveText += async (sender, message) => { await webSocketConnection.SendAsync(message, CancellationToken.None); };
+                    WebSocketConnection webSocketConnection = new WebSocketConnection(webSocket, textSubProtocol ?? _options.DefaultSubProtocol);
+                    webSocketConnection.Receive += async (sender, message) => { await webSocketConnection.SendAsync(message, CancellationToken.None); };
 
                     _connectionsService.AddConnection(webSocketConnection);
 

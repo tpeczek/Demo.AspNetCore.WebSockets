@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,8 +9,8 @@ namespace Demo.AspNetCore.WebSockets.Infrastructure
     {
         string SubProtocol { get; }
 
-        Task SendAsync(string message, Func<byte[], CancellationToken, Task> sendMessageBytesAsync, CancellationToken cancellationToken);
+        Task SendAsync(string message, Stream webSocketMessageStream, CancellationToken cancellationToken);
 
-        string Read(string rawMessage);
+        string Read(Stream webSocketMessageStream);
     }
 }
