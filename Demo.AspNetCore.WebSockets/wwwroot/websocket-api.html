@@ -10,9 +10,11 @@
         <div id="echo-configuration">
             <label for="location">Location:</label><br>
             <input type="text" id="location" value="ws://localhost:63290/socket"><br>
-            <label for="location">Subprotocols:</label><br>
+            <label>Subprotocols:</label><br>
             <input type="checkbox" id="plainTextSubprotocol" checked="checked" /> <label for="plainText" class="checkbox-label">aspnetcore-ws.plaintext</label><br>
             <input type="checkbox" id="jsonSubprotocol" checked="checked" /> <label for="json" class="checkbox-label">aspnetcore-ws.aspnetcore-ws.json</label><br>
+            <label>⚠ Experimental:</label><br>
+            <input type="checkbox" id="webSocketStream" /> <label for="webSocketStream" class="checkbox-label">WebSocketStream</label><br>
             <button id="connect">Connect</button>
             <button disabled="disabled" id="disconnect">Disconnect</button>
             <br><br>
